@@ -15,6 +15,7 @@
         <module>ssm-spring-quartz</module>
         <module>ssm-spring-mybatis</module>
         <module>ssm-spring</module>
+        <module>ssm-mybatis</module>
     </modules>
 
     <properties>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="jdbc.properties"/>
+
+    <settings>
+        <!-- 开启日志,并指定使用的具体日志 -->
+        <setting name="logImpl" value="LOG4J"/>
+        <!-- 开启延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 关闭立即加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 开启二级缓存 -->
+        <setting name="cacheEnabled" value="true" />
+    </settings>
+
+    <typeAliases>
+        <!-- 别名忽略大小写 -->
+        <package name="com.kk.entity"/>
+    </typeAliases>
+
+    <typeHandlers>
+        <typeHandler handler="com.kk.converter.MySexConverter"
+        javaType="Boolean" jdbcType="INTEGER"/>
+    </typeHandlers>
+
+    <!-- 通过environments的default值和environment的id来指定默认环境 -->
+    <environments default="development">
+        <!-- 开发环境 -->
+        <environment id="development">
+            <!-- 事务管理方式:
+                    JDBC:使用JDBC方式处理事务(commit,rollback,close)
+                    MANAGED:将事务交由其他组件去管理(Spring,Jobss),默认会关闭连接
+             -->
+            <transactionManager type="JDBC"/>
+            <!-- 数据源类型:
+                    UNPOOLED:传统的JDBC模式
+                    POOLED:使用数据库连接池
+                    JNDI:从tomcat中获取一个内置的数据库连接池
+             -->
+            <dataSource type="POOLED">
+                <!-- 配置数据库信息 -->
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+
+        <!-- 测试环境 -->
+        <environment id="test">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <!-- 配置数据库信息 -->
+                <property name="driver" value="${test.driver}"/>
+                <property name="url" value="${test.url}"/>
+                <property name="username" value="${test.username}"/>
+                <property name="password" value="${test.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 加载映射文件 -->
+    <mappers>
+        <package name="com.kk.mapper"/>
+    </mappers>
+
+</configuration>

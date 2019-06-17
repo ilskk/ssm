@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace:文件唯一标识符 -->
+<!-- <mapper namespace="a.b.c.personMapper"> -->
+<!-- 动态代理 -->
+<mapper namespace="com.kk.mapper.PersonMapper">
+
+    <!-- 声明开启Mybatis二级缓存
+     不序列化则可以使用,readOnly="true";
+     开启第三方缓存(EhCache) type="org.mybatis.caches.ehcache.EhcacheCache"
+     -->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache">
+        <!-- 通过property属性覆盖EhCache.xml中的参数值 -->
+        <property name="maxElementsInMemory" value="2000"/>
+    </cache>
+
+    <!-- 提取sql片段 -->
+    <sql id="selectTable">
+        select * from person
+    </sql>
+
+    <!--
+        parameterType:参数类型
+        resultType:返回值类型
+        (1),如果类中属性和表中类型能匹配(String->varchar),
+        如果类中属性和表中字段名不能匹配(pName->pname),则可以使用resultType自动转换
+        (2),除(1)外必须使用resultMap来进行手动转换
+     -->
+    <resultMap id="personMap" type="Person">
+        <!-- 主键id,非主键result -->
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"
+                javaType="boolean" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 查询:使用了自定义类型转换器 -->
+    <select id="selectConverter" parameterType="Integer" resultMap="personMap">
+        select * from person where id = #{id}
+    </select>
+
+    <insert id="insertConverter" parameterType="Person">
+        insert into person values(default ,#{name},#{age},
+        #{sex,javaType=boolean,jdbcType=INTEGER});
+    </insert>
+
+    <!--<resultMap id="personMapping" type="Person">-->
+        <!--<id property="pid" column="id"/>-->
+    <!--</resultMap>-->
+
+    <!--
+        #{}:自动给String类型加上''(自动转换),可以防止sql注入
+        ${}:原样输出,适用于动态排序(动态字段),不能防止sql注入
+    -->
+
+    <select id="selectHashMap" parameterType="HashMap" resultType="Person">
+        select * from person where name = #{name} or age = #{age}
+    </select>
+
+    <!-- 级联属性 -->
+    <select id="selectByPerson" parameterType="Person" resultType="Person">
+        select * from person where address = #{address.address}
+    </select>
+
+    <select id="selectByNameOrAge" parameterType="Person" resultType="Person">
+        select * from person where age = #{age} or name like '%${name}%'
+    </select>
+
+    <!-- 禁用此select的二级缓存:
+            useCache="false",
+            flushCache="true"-->
+    <select useCache="true" flushCache="false" id="selectById" parameterType="Integer" resultType="Person">
+        select * from person where id = #{id}
+    </select>
+
+    <select id="selectByName" parameterType="String" resultType="Person">
+        select * from person where name = '${value}'
+    </select>
+
+    <select id="selectOrderByColumn" parameterType="String" resultType="Person">
+        select * from person order by ${value} asc
+    </select>
+
+    <select id="selectPersonAll" resultType="Person">
+        select * from person
+    </select>
+
+    <insert id="insertPerson" parameterType="Person">
+        insert into person values(default ,#{name},#{age});
+    </insert>
+
+    <update id="updatePersonById" parameterType="Person">
+        update person set name = #{name} , age = #{age} where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from person where id = #{id}
+    </delete>
+
+    <!-- 通过存储过程查询当前日期 -->
+    <select id="queryDate" statementType="CALLABLE" resultType="String">
+        { call getDate(#{date,jdbcType=VARCHAR,mode=OUT}) }
+    </select>
+
+    <!-- 通过存储过程删除person -->
+    <select id="removePersonById" statementType="CALLABLE" parameterType="Integer">
+        { call removePersonById(#{id,javaType=INTEGER,mode=IN}) }
+    </select>
+
+    <select id="selectPersonCount" resultType="Integer">
+        select count(*) from  person
+    </select>
+
+    <!-- 通过别名作为map的key -->
+    <select id="selectPersonAllIsMap" resultType="HashMap">
+        select id "id",name "name",age "age" from person
+    </select>
+
+    <!-- Sql标签! -->
+
+    <!-- where标签会自动且只处理第一个if标签中的第一个and -->
+    <select id="queryPersonByNameAndAge" parameterType="Person" resultType="Person">
+        select id,name,age from person
+        <where>
+            <if test="name!=null and name!=''">
+                and name = #{name}
+            </if>
+            <if test="age!=null and age!=0">
+                and age = #{age}
+            </if>
+        </where>
+    </select>
+
+    <!-- foreach标签:用于迭代数组,数组对象,集合,属性(IDs类:List<Integer> ids) -->
+    <select id="queryPeronByIDs" parameterType="IDs" resultType="Person">
+        select * from person
+        <where>
+            <if test="ids!=null and ids.size>0">
+            <foreach collection="ids" item="id"
+             separator="," open=" and id in (" close=")">
+                #{id}
+            </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 传基本数据类型数组,数组名默认且必须是array -->
+    <select id="queryPeronByArray" parameterType="int[]" resultType="Person">
+        select * from person
+        <where>
+            <if test="array!=null and array.length>0">
+                <foreach collection="array" item="index"
+                         separator="," open=" and id in (" close=")">
+                    #{index}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 传集合,集合名默认且必须是list,set,map -->
+    <select id="queryPeronByList" parameterType="list" resultType="Person">
+        select * from person
+        <where>
+            <if test="list!=null and list.size>0">
+                <foreach collection="list" item="index"
+                         separator="," open=" and id in (" close=")">
+                    #{index}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPeronByObjectArray" parameterType="Object[]" resultType="Person">
+--         引用sql片段 refid="sql片段id"
+        <include refid="selectTable"/>
+        <where>
+            <if test="array!=null and array.length>0">
+                <foreach collection="array" item="index"
+                         separator="," open=" and id in (" close=")">
+                    #{index.id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 利用扩展类来实现一对一 -->
+    <select id="queryPersonByOO" parameterType="Integer" resultType="PersonExtension">
+        select p.*,pc.* from person p join personcard pc on p.cid = pc.cid
+        where id = #{id}
+    </select>
+
+    <resultMap id="personMap2" type="Person">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"
+                javaType="boolean" jdbcType="INTEGER"/>
+        <!-- 一对一,对象成员使用association映射,javaType指定该属性的类型 -->
+        <association property="personCard" javaType="PersonCard">
+            <id property="cid" column="cid"/>
+            <result property="cinfo" column="cinfo"/>
+        </association>
+    </resultMap>
+
+    <!-- 利用resultMap来实现一对一 -->
+    <select id="queryPersonByOO2" parameterType="Integer" resultMap="personMap2">
+        select p.*,pc.* from person p join personcard pc on p.cid = pc.cid
+        where p.id = #{id}
+    </select>
+
+    <resultMap id="personLevelMap" type="PersonLevel">
+        <id property="lid" column="lid"/>
+        <result property="lname" column="lname"/>
+        <collection property="list" ofType="Person">
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="age" column="age"/>
+            <result property="sex" column="sex"
+                    javaType="boolean" jdbcType="INTEGER"/>
+            <association property="personCard" javaType="PersonCard">
+                <id property="cid" column="cid"/>
+                <result property="cinfo" column="cinfo"/>
+            </association>
+        </collection>
+    </resultMap>
+
+    <select id="queryPersonLevelOO" parameterType="Integer" resultMap="personLevelMap">
+        select pl.*,p.* from personlevel pl join person p on pl.lid = p.lid
+        where pl.lid = #{id}
+    </select>
+
+    <resultMap id="personMap_lazyload" type="Person">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"
+                javaType="boolean" jdbcType="INTEGER"/>
+         <!--采用延迟加载:在查询person时,并不立即加载personCard信息,在需要的时候在查询 -->
+        <association property="personCard" javaType="PersonCard"
+          select="queryPersonCardById" column="cid">
+            <!--<id property="cid" column="cid"/>
+            <result property="cinfo" column="cinfo"/>-->
+        </association>
+    </resultMap>
+
+    <!-- 先查person -->
+    <select id="queryPersonByOO_lazyload" resultMap="personMap_lazyload">
+        select * from person
+    </select>
+
+    <!-- 查询personCard -->
+    <select id="queryPersonCardById" parameterType="Person" resultType="PersonCard">
+        <!-- 查询Person对应的personCard -->
+        select * from personcard where cid = #{cid}
+    </select>
+</mapper>
