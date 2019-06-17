@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="scheduleJob" class="com.kk.entity.ScheduleJob" >
+        <property name="jobId" value="j-01"/>
+        <property name="jobName" value="任务-1"/>
+        <property name="jobGroup" value="任务组-1"/>
+        <property name="jobStatus" value="1"/>
+        <property name="cronExpression" value="5,10,30,50 * * * * ? *"/>
+        <property name="desc" value="描述..."/>
+    </bean>
+
+    <bean id="jobDetailFactoryBean" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.kk.job.PlanJob"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="scheduleJob">
+                    <!--<ref bean="scheduleJob"/>-->
+                    <ref bean="simpleTriggerFactoryBean"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 触发器:定义触发的时间规则 -->
+    <bean id="cronTriggerFactoryBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetailFactoryBean"/>
+        <property name="cronExpression" value="#{scheduleJob.cronExpression}"/>
+    </bean>
+
+    <!-- 简单触发器 -->
+    <bean id="simpleTriggerFactoryBean" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="repeatInterval" value="2000"/>
+        <property name="repeatCount" value="10"/>
+        <property name="startDelay" value="3"/>
+    </bean>
+
+    <!-- 调度器 -->
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="cronTriggerFactoryBean"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--<bean id="planJob" class="com.kk.job.PlanJob">-->
+        <!--<property name="meetingService" ref="meetingService"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="meetingService" class="com.kk.service.MeetingService"/>-->
+
+</beans>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd"
+        default-autowire="default"
+        >
+
+    <!-- 配置数据库相关-事务 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/ssm"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 增加对事务的支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+    <!-- 配置扫描器 -->
+    <context:component-scan base-package="com.kk.entity,com.kk.dao,com.kk.service"/>
+
+    <!-- 该文件中的bean对象,被放入了一个叫spring ioc容器的地方 -->
+    <!-- id:唯一标识符,class:指定类型 -->
+    <bean id="student" class="com.kk.entity.Student">
+        <!-- property:该class所代表类的属性(set方法注入)
+            name:属性名,value:属性值 -->
+        <property name="stuNo" value="6"/>
+        <property name="stuName" value="六小龄童"/>
+        <property name="setAge" value="666"/>
+    </bean>
+
+    <bean id="javaCourse" class="com.kk.newinstance.JavaCourse"/>
+    <bean id="htmlCourse" class="com.kk.newinstance.HtmlCourse"/>
+
+    <bean class="com.kk.entity.Teacher" id="teacher">
+        <!-- 处理null值 ""-->
+        <property name="teacherName"  value="">
+            <!--<null/>-->
+        </property>
+        <!--<property name="teacherName">-->
+            <!--<value type="java.lang.String">吕老师<![CDATA[!=?]]]></value>-->
+        <!--</property>-->
+            <!--<property name="teacherName" value="黄&lt;老师"/>-->
+    </bean>
+
+    <bean class="com.kk.entity.Course" id="course1" autowire="byType"/>
+
+                                                    <!-- 引入p命名空间注入属性 -->
+    <bean class="com.kk.entity.Course" id="course" p:courseName="数学" p:teacher-ref="teacher">
+        <!-- setCourseName("英语")
+            setCourseName -> setCourseName():依赖注入底层是通过反射实现的
+         -->
+        <!-- 通过set方法为属性赋值 -->
+        <!--<property name="courseName" value="英语"/>-->
+        <!-- 将teacher对象注入到course对象中的teacher属性中-->
+              <!--setTeacher(teacher)      -->
+        <!--<property name="teacher" ref="teacher"/>-->
+
+        <!-- 通过构造器对属性赋值 -->
+        <!--<constructor-arg name="courseName" index="0" type="java.lang.String" value="计算机" />
+            <constructor-arg name="teacher" ref="teacher"/>-->
+    </bean>
+
+    <bean class="com.kk.entity.CollectionType" id="collectionType">
+        <property name="list">
+            <list>
+                <value>老鼠</value>
+                <value>野牛</value>
+                <value>白虎</value>
+            </list>
+        </property>
+        <property name="arr">
+            <array>
+                <value>跑车</value>
+                <value>越野车</value>
+                <value>赛车</value>
+            </array>
+        </property>
+        <property name="set">
+            <set>
+                <value>语文</value>
+                <value>数学</value>
+                <value>英语</value>
+            </set>
+        </property>
+        <property name="map">
+            <map>
+                <entry key="A" value="1"/>
+                <entry key="B" value="2"/>
+                <entry key="C" value="3"/>
+            </map>
+        </property>
+        <property name="properties">
+            <props>
+                <prop key="person-1">地球人</prop>
+                <prop key="person-2">火星人</prop>
+                <prop key="person-3">太空人</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>

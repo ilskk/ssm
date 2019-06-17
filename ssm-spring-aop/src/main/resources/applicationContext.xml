@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+
+
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+        <!-- 开启扫描 -->
+        <context:component-scan base-package="com.kk.annotations"/>
+
+        <!-- 配置前置通知类 -->
+       <bean class="com.kk.advice.BeforeAdvice" id="beforeAdvice"/>
+       <bean class="com.kk.advice.AfterAdvice" id="afterAdvice"/>
+       <bean class="com.kk.advice.ExceptionAdvice" id="exceptionAdvice"/>
+       <bean class="com.kk.advice.AroundAdvice" id="aroundAdvice"/>
+
+        <!-- 配置需要通知的类 -->
+        <bean class="com.kk.service.AdviceService" id="adviceService"/>
+
+        <!-- 将需要通知的类和通知类进行关联 -->
+        <aop:config>
+            <!-- 配置切入点(在哪里执行通知) -->
+            <!--<aop:pointcut id="point" expression="execution(* com.kk.service.*.*(..) )"/>-->
+            <!-- advisor:相当于连接切入点和切面的线 -->
+            <!--<aop:advisor advice-ref="beforeAdvice" pointcut-ref="point"/>
+            <aop:advisor advice-ref="afterAdvice" pointcut-ref="point"/>
+            <aop:advisor advice-ref="exceptionAdvice" pointcut-ref="point"/>-->
+            <!--<aop:advisor advice-ref="aroundAdvice" pointcut-ref="point"/>-->
+        </aop:config>
+
+        <!-- 开启对AOP注解的支持 -->
+        <!--<aop:aspectj-autoproxy/>-->
+
+        <bean class="com.kk.schema.Advice" id="advice-schema"/>
+
+        <!-- schema方式 -->
+        <aop:config>
+            <aop:pointcut id="point" expression="execution(* com.kk.service.*.*(..) )"/>
+            <aop:aspect ref="advice-schema">
+                <aop:before method="before" pointcut-ref="point"/>
+                <aop:after-returning method="myAfterReturn" pointcut-ref="point" returning="returnValue"/>
+                <aop:after-throwing method="myException" pointcut-ref="point" throwing="e"/>
+                <aop:around method="myAround" pointcut-ref="point"/>
+                <aop:after method="myAfter" pointcut-ref="point"/>
+            </aop:aspect>
+        </aop:config>
+</beans>
