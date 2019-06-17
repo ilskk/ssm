@@ -10,12 +10,14 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>ssm-spring-aop</module>
-        <module>ssm-spring-web</module>
         <module>ssm-spring-annotation</module>
         <module>ssm-spring-quartz</module>
         <module>ssm-spring-mybatis</module>
         <module>ssm-spring</module>
         <module>ssm-mybatis</module>
+        <module>ssm-springmvc</module>
+        <module>ssm-spring-web</module>
+        <module>ssm-spring-web2</module>
     </modules>
 
     <properties>
