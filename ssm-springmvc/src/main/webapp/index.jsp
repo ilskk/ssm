@@ -34,6 +34,12 @@
 
     <a href="/demo10">demo10-ModelAndView</a><br/>
     <a href="/demo11">demo11-{3}</a><br/>
-    <a href="/demo12">demo12-setName</a>
+    <a href="/demo12">demo12-setName</a><br/>
+    <a href="/images/1.jpg">图1</a><br/>
+
+    <form action="/demo13" method="post">
+        Person:<input type="text" name="personInfo"/>
+        <input type="submit"/>
+    </form>
 </body>
 </html>

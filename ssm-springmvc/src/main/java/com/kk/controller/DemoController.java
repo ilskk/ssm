@@ -134,4 +134,10 @@ public class DemoController {
         return "success";
     }
 
+    @RequestMapping("/demo13")
+    public String demo13(@RequestParam("personInfo") Person person){
+        System.out.println(person);
+        return "success";
+    }
+
 }

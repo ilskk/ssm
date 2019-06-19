@@ -10,6 +10,7 @@
 	   http://www.springframework.org/schema/mvc
 	   http://www.springframework.org/schema/mvc/spring-mvc.xsd ">
 
+	<!-- 扫描有注解的包 -->
 	<context:component-scan base-package="com.kk.controller"/>
 
 	<!-- 视图解析器 -->
@@ -34,15 +35,30 @@
 		</property>
 	</bean>
 
-	<!-- 注册MVC注解驱动 -->
-	<mvc:annotation-driven />
-
 	<!-- 加载国际化资源文件 -->
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename" value="i18n"/>
 	</bean>
 
-	<!--&lt;!&ndash; 处理springmvc以外的url请求 &ndash;&gt;-->
-	<!--<mvc:default-servlet-handler/>-->
+	 <!--使用服务器默认servlet处理静态资源的请求 -->
+	<mvc:default-servlet-handler/>
+
+	<!-- 往容器中纳入自定义类型转换器 -->
+	<bean id="myConverter" class="com.kk.converter.MyConverter"/>
+
+	<!-- 将自定义转换器纳入SpringMVC提供的转换器Bean -->
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<ref bean="myConverter"/>
+			</set>
+		</property>
+	</bean>
+
+	<!-- 通过注解注册转换器Bean -->
+	<mvc:annotation-driven conversion-service="conversionService"/>
+
+	<!-- 配置数据格式化注解所需的Bean -->
+	<!--<bean id="factoryBean" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>-->
 
 </beans>
