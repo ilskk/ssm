@@ -19,22 +19,6 @@
 		<property name="suffix" value=".jsp"/>
 	</bean>
 
-	<!-- 设置@ResponseBody的返回值编码为UTF-8 -->
-	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
-		<property name="messageConverters">
-			<list>
-				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
-					<property name="supportedMediaTypes">
-						<list>
-							<value>text/plain;charset=utf-8</value>
-							<value>text/html;charset=UTF-8</value>
-						</list>
-					</property>
-				</bean>
-			</list>
-		</property>
-	</bean>
-
 	<!-- 加载国际化资源文件 -->
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename" value="i18n"/>
@@ -56,10 +40,15 @@
 	</bean>-->
 
 	<!-- 通过注解注册转换器Bean -->
-    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+    <mvc:annotation-driven conversion-service="conversionService"/>
 
 	<!-- 配置数据格式化注解所需的Bean -->
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
-    </bean>
+    	<property name="converters">
+			<set>
+				<ref bean="myConverter"/>
+			</set>
+		</property>
+	</bean>
 
 </beans>
