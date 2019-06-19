@@ -81,7 +81,7 @@ public class DemoController {
         return jsessionid;
     }
 
-    @RequestMapping("/demo9")
+    @RequestMapping(value = "/demo9",produces = "application/json; charset=utf-8")
     //person属性必须和form表单中的标签name属性一致(支持级联属性),才能赋值
     public @ResponseBody String demo9(Person person){
         return person.toString();
