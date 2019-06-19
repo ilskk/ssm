@@ -140,4 +140,10 @@ public class DemoController {
         return "success";
     }
 
+    @RequestMapping("/demo14")
+    public String demo14(Person person){
+        System.out.println(person);
+        return "success";
+    }
+
 }

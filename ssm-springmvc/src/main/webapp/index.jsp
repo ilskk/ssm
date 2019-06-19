@@ -29,7 +29,7 @@
         id:<input name="id"/><br/>
        name:<input name="name"/><br/>
         addressName:<input name="address.addressName"/>
-        <input type="submit"/>
+        <input type="submit" value="提交"/>
     </form>
 
     <a href="/demo10">demo10-ModelAndView</a><br/>
@@ -39,7 +39,14 @@
 
     <form action="/demo13" method="post">
         Person:<input type="text" name="personInfo"/>
-        <input type="submit"/>
+        <input type="submit" value="提交"/>
+    </form>
+    <br/>
+    <form action="/demo14" method="post">
+        id:<input name="id"/><br/>
+        name:<input name="name"/><br/>
+        day:<input name="day"/>
+        <input type="submit" value="提交"/>
     </form>
 </body>
 </html>

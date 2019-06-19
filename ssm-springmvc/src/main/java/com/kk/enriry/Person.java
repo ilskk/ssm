@@ -1,17 +1,16 @@
 package com.kk.enriry;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+
 public class Person {
     private Integer id;
     private String name;
     private Address address;
 
-    public Person() {
-    }
-
-    public Person(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date day;
 
     @Override
     public String toString() {
@@ -19,7 +18,16 @@ public class Person {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", address=" + address +
+                ", day=" + day +
                 '}';
+    }
+
+    public Person() {
+    }
+
+    public Person(Integer id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Integer getId() {
@@ -44,5 +52,13 @@ public class Person {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public Date getDay() {
+        return day;
+    }
+
+    public void setDay(Date day) {
+        this.day = day;
     }
 }

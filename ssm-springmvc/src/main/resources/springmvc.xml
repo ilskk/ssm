@@ -47,18 +47,19 @@
 	<bean id="myConverter" class="com.kk.converter.MyConverter"/>
 
 	<!-- 将自定义转换器纳入SpringMVC提供的转换器Bean -->
-	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+	<!--<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
 		<property name="converters">
 			<set>
 				<ref bean="myConverter"/>
 			</set>
 		</property>
-	</bean>
+	</bean>-->
 
 	<!-- 通过注解注册转换器Bean -->
-	<mvc:annotation-driven conversion-service="conversionService"/>
+    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
 
 	<!-- 配置数据格式化注解所需的Bean -->
-	<!--<bean id="factoryBean" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>-->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+    </bean>
 
 </beans>
