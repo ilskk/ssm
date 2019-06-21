@@ -219,8 +219,6 @@ public class DemoController {
     public String exceptionHandler(){
 //        try {
             System.out.println(1/0);
-//        String s=null;
-//        System.out.println(s.trim());
 //        } catch (ArithmeticException e) {
 //            e.printStackTrace();
 //        }
@@ -228,7 +226,7 @@ public class DemoController {
     }
 
     //可以捕获ArithmeticException异常
-    @ExceptionHandler({ArithmeticException.class,NullPointerException.class})
+    @ExceptionHandler({ArithmeticException.class})
     public ModelAndView handleArithmeticException(Exception ex){
         System.out.println(ex);
         ModelAndView mv = new ModelAndView("error");
