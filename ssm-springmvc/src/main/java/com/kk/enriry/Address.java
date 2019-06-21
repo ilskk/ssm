@@ -12,9 +12,7 @@ public class Address {
 
     @Override
     public String toString() {
-        return "Address{" +
-                "addressName='" + addressName + '\'' +
-                '}';
+        return "O";
     }
 
     public String getAddressName() {

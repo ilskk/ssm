@@ -5,8 +5,27 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Insert title here</title>
+    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#button").click(function(){
+                //通过ajax请求springmvc
+                $.post(
+                    "/ajax",//服务器地址
+                    //{"name":"zs","age":23}
+                    function(result){//服务端处理完毕后的回调函数,@ResponseBody后,list<Address>就是一个json数组的格式
+                        for(var i=0;i<result.length ;i++){
+                            alert(result[i].addressName);
+                        }
+                    }
+                );
+            });
+        });
+    </script>
 </head>
 <body>
+    <a href="/fc">Form</a><br/>
+    <input type="button" id="button" value="Ajax" /><br/>
     <a href="/i18n">i18n</a><br/>
 
     <a href="/success">get</a>
@@ -17,36 +36,50 @@
         <input type="submit" value="post">
     </form>
 
-    <a href="/demo">demo-head</a><br/>
-    <a href="/demo2/axb/test">demo2-?</a><br/>
-    <a href="/demo3/x/test">demo3-*</a><br/>
-    <a href="/demo4/x/q/test">demo4-**</a><br/>
-    <a href="/demo5/java">demo5-result</a><br/>
-    <a href="/demo7">demo7-head</a><br/>
-    <a href="/demo8">demo8-jsessionid</a>
+    <a href="/head"></a><br/>
+    <a href="/ant1/axb/test">ant1-?</a><br/>
+    <a href="/ant2/xxxxx/test">ant2-*</a><br/>
+    <a href="/ant3/x/xx/xxx/test">ant3-**</a><br/>
+    <a href="/result/java">result</a><br/>
+    <a href="/params">params</a><br/>
+    <a href="/accept">head</a><br/>
+    <a href="/jsessionid">jsessionid</a>
 
-    <form action="/demo9" method="post">
+    <form action="/json" method="post">
         id:<input name="id"/><br/>
        name:<input name="name"/><br/>
         addressName:<input name="address.addressName"/>
         <input type="submit" value="提交"/>
     </form>
 
-    <a href="/demo10">demo10-ModelAndView</a><br/>
-    <a href="/demo11">demo11-{3}</a><br/>
-    <a href="/demo12">demo12-setName</a><br/>
+    <a href="/modelAndView">ModelAndView</a><br/>
+    <a href="/mmm">mmm</a><br/>
+    <a href="/modify">modify</a><br/>
     <a href="/images/1.jpg">图1</a><br/>
 
-    <form action="/demo13" method="post">
+    <form action="/converter" method="post">
         Person:<input type="text" name="personInfo"/>
         <input type="submit" value="提交"/>
     </form>
     <br/>
-    <form action="/demo14" method="post">
+    <form action="/formatting" method="post">
         id:<input name="id"/><br/>
         name:<input name="name"/><br/>
-        day:<input name="day"/>
+        day:<input name="day"/><br/>
+        email:<input name="email">
         <input type="submit" value="提交"/>
     </form>
+    <hr/>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="fileName" /><br/>
+        描述:<input type="text" name="desc" /><br/>
+        <input type="submit" value="上传"/><span>${status}</span>
+    </form>
+
+    <hr/>
+    <a href="/interceptor">Interceptor</a><br/>
+    <a href="/me">MyException</a><br/>
+    <a href="/eh">ExceptionHandler</a><br/>
+    <a href="/ms">ExceptionStatus</a>
 </body>
 </html>

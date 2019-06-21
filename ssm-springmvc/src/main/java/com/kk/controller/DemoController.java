@@ -2,14 +2,25 @@ package com.kk.controller;
 
 import com.kk.enriry.Address;
 import com.kk.enriry.Person;
+import com.kk.exception.MyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 //types = Person.class,将所有Person类型的对象放入session域中
@@ -27,32 +38,32 @@ public class DemoController {
     }
 
     //headers:限制请求头
-    @RequestMapping(value = "/demo",headers = {"Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+    @RequestMapping(value = "/head",headers = {"Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
                                     ,"Accept-Encoding=gzip, deflate, br"})
-    public String demo(){
+    public String head(){
         return "success";
     }
 
     //Ant风格:?(任意单个字符)
-    @RequestMapping(value = "/demo2/a?b/test")
-    public String demo2(){
+    @RequestMapping(value = "/ant1/a?b/test")
+    public String ant1(){
         return "success";
     }
 
     //*(任意字符)
-    @RequestMapping(value = "/demo3/*/test")
-    public String demo3(){
+    @RequestMapping(value = "/ant2/*/test")
+    public String ant2(){
         return "success";
     }
 
     //**(任意路径)
-    @RequestMapping(value = "/demo4/**/test")
-    public String demo4(){
+    @RequestMapping(value = "/ant3/**/test")
+    public String ant3(){
         return "success";
     }
 
-    @RequestMapping("/demo5/{param}")
-    public String demo5(@PathVariable("param") String str){
+    @RequestMapping("/result/{param}")
+    public String result(@PathVariable("param") String str){
         System.out.println("参数111:"+str);
         return "success";
     }
@@ -63,33 +74,33 @@ public class DemoController {
             required=true:表示参数值必须要有
      */
 
-    @RequestMapping(value = "/demo6")
-    public String demo6(@RequestParam(value = "abc",required = true,defaultValue = "默认值123") String str){
+    @RequestMapping(value = "/params")
+    public String params(@RequestParam(value = "abc",required = true,defaultValue = "默认值123") String str){
         System.out.println("参数:"+str);
         return "success";
     }
 
     //@RequestHeader("Accept"):获取请求头中的Accept信息
-    @RequestMapping("/demo7")
-    public String demo7(@RequestHeader("Accept") String head){
+    @RequestMapping("/accept")
+    public String accept(@RequestHeader("Accept") String head){
         System.out.println("Accept:"+head);
         return "success";
     }
 
-    @RequestMapping("/demo8")
-    public @ResponseBody String demo8(@CookieValue("JSESSIONID") String jsessionid){
+    @RequestMapping("/jsessionid")
+    public @ResponseBody String jsessionid(@CookieValue("JSESSIONID") String jsessionid){
         return jsessionid;
     }
 
-    @RequestMapping(value = "/demo9",produces = "application/json; charset=utf-8")
-    //person属性必须和form表单中的标签name属性一致(支持级联属性),才能赋值
-    public @ResponseBody String demo9(Person person){
+    @RequestMapping(value = "/json",produces = "application/json; charset=utf-8")
+    //person属性必须和form表单中的标签name属性一致(支持级联属性)`,才能赋值
+    public @ResponseBody String json(Person person){
         return person.toString();
     }
 
-    @RequestMapping("/demo10")
+    @RequestMapping("/modelAndView")
     //在映射方法参数上可以直接使用原生servlet
-    public ModelAndView demo10(HttpServletRequest request){
+    public ModelAndView modelAndView(HttpServletRequest request){
         ModelAndView mav=new ModelAndView();
         //将数据放入request域中
         mav.addObject("mav","ModelAndView");
@@ -98,7 +109,7 @@ public class DemoController {
         return mav;
     }
 
-    @RequestMapping("/demo11")
+    @RequestMapping("/mmm")
     public String demo11(Model model, ModelMap modelMap, Map map){
         model.addAttribute("model","model值");
         modelMap.addAttribute("modelmap","modelmap值");
@@ -120,8 +131,8 @@ public class DemoController {
         map.put("p123",new Person(3,"张三丰"));
     }
 
-    @RequestMapping("/demo12")
-    public String demo12(@ModelAttribute("p123") Person person){
+    @RequestMapping("/modify")
+    public String modify(@ModelAttribute("p123") Person person){
         System.out.println(person);
         person.setName("小刚");
         System.out.println(person);
@@ -134,16 +145,118 @@ public class DemoController {
         return "success";
     }
 
-    @RequestMapping("/demo13")
-    public String demo13(@RequestParam("personInfo") Person person){
+    @RequestMapping("/converter")
+    public String converter(@RequestParam("personInfo") Person person){
         System.out.println(person);
         return "success";
     }
 
-    @RequestMapping("/demo14")
-    public String demo14(Person person){
+    @RequestMapping("/formatting")//如果Person格式化出错,会将出错信息传入BindingResult(只能放在错误参数后一位)
+    public String formatting(@Valid Person person, BindingResult result, Map<String,List<FieldError>> map){
         System.out.println(person);
+
+        if(result.getErrorCount()>0){
+            for (FieldError error:result.getFieldErrors()) {
+                System.out.println(error.getDefaultMessage());
+                map.put("errors",result.getFieldErrors());
+            }
+        }
+
+        return "success";
+    }
+
+    @RequestMapping(value = "/ajax",produces = "application/json; charset=utf-8")
+    public @ResponseBody List<Address> ajax(){
+
+        List<Address> list=new ArrayList<>();
+        list.add(new Address("湖南"));
+        list.add(new Address("北京"));
+        list.add(new Address("广州"));
+
+        return list;
+    }
+
+    @RequestMapping("/upload")
+    public String upload(@RequestParam("desc") String desc,@RequestParam("fileName") MultipartFile file,Model model){
+        System.out.println("文件描述信息:"+desc);
+
+        InputStream in=null;
+        OutputStream out=null;
+        try {
+           in= file.getInputStream();
+            //将要上传到服务器的文件保存到硬盘中
+           out=new FileOutputStream("C:\\Users\\Administrator\\Desktop\\material\\"+file.getOriginalFilename());
+
+           byte[] buf=new byte[1024*1024*10];
+           int len=0;
+           while ((len=in.read(buf))!=-1){
+               out.write(buf,0,len);
+           }
+
+           model.addAttribute("status","上传成功!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return "index";
+    }
+
+    @RequestMapping("/interceptor")
+    public String interceptor(){
+        System.out.println("调用控制器方法");
+        return "success";
+    }
+
+    @RequestMapping("/eh")
+    public String exceptionHandler(){
+//        try {
+            System.out.println(1/0);
+//        String s=null;
+//        System.out.println(s.trim());
+//        } catch (ArithmeticException e) {
+//            e.printStackTrace();
+//        }
+        return "success";
+    }
+
+    //可以捕获ArithmeticException异常
+    @ExceptionHandler({ArithmeticException.class,NullPointerException.class})
+    public ModelAndView handleArithmeticException(Exception ex){
+        System.out.println(ex);
+        ModelAndView mv = new ModelAndView("error");
+        mv.addObject("exception", ex);
+        return mv;
+    }
+
+    @RequestMapping("/me")
+    public String me(@RequestParam("i") Integer i)throws MyException{
+        if(i==3){
+            throw new MyException();
+        }
+        return "success";
+    }
+
+    @RequestMapping("/ms")
+    public String demo19(@RequestParam("i") Integer i)throws MyException{
+        if(i==3){
+            return "forward:/status";
+        }
+        return "success";
+    }
+
+    @ResponseStatus(value = HttpStatus.CONFLICT,reason = "测试")
+    @RequestMapping("/status")
+    public String myStatus(){
         return "success";
     }
 
 }
+

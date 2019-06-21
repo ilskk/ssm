@@ -11,7 +11,30 @@
 	   http://www.springframework.org/schema/mvc/spring-mvc.xsd ">
 
 	<!-- 扫描有注解的包 -->
-	<context:component-scan base-package="com.kk.controller"/>
+	<context:component-scan base-package="com.kk.*"/>
+
+    <!-- 配置拦截器(默认拦截所有控制器) -->
+    <mvc:interceptors>
+        <!--<bean class="com.kk.interceptor.MyInterceptor"/>-->
+        <!-- 配置指定路径的拦截器 -->
+        <mvc:interceptor>
+            <!-- 指定拦截的路径,基于ant风格 -->
+            <mvc:mapping path="/demo1?"/>
+            <!-- 指定不拦截的路径 -->
+            <mvc:exclude-mapping path="/demo16"/>
+            <bean class="com.kk.interceptor.MyInterceptor"/>
+        </mvc:interceptor>
+        <!-- 配置指定路径的拦截器 -->
+        <mvc:interceptor>
+            <!-- 指定拦截的路径,基于ant风格 -->
+            <mvc:mapping path="/demo1?"/>
+            <!-- 指定不拦截的路径 -->
+            <mvc:exclude-mapping path="/demo13"/>
+            <bean class="com.kk.interceptor.MyInterceptor2"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
 	<!-- 视图解析器 -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/"/>
@@ -39,7 +62,9 @@
 	</bean>-->
 
 	<!-- 通过注解注册转换器Bean -->
-    <mvc:annotation-driven conversion-service="conversionService"/>
+    <!--<mvc:annotation-driven conversion-service="conversionService"/>-->
+	<!-- 会在spring容器中自动加载LocalValidatorFactory -->
+	<mvc:annotation-driven conversion-service="conversionService"/>
 
 	<!-- 配置数据格式化注解所需的Bean -->
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
@@ -48,6 +73,13 @@
 				<ref bean="myConverter"/>
 			</set>
 		</property>
+	</bean>
+
+	<!-- 配置文件上传与下载,id必须为multipartResolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8"/>
+		<!-- 上传单个文件的最大值,单位byte,如果值为-1,表示无限制 -->
+		<property name="maxUploadSize" value="1048576"/>
 	</bean>
 
 </beans>

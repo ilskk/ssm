@@ -45,7 +45,9 @@ public class Test {
 //
 //        session.close();
 
-        mapper();
+        //mapper();//
+        Object o=new Integer(1);
+        System.out.println(o);
 
 //        cache();
 
