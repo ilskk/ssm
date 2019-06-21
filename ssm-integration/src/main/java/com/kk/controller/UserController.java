@@ -20,7 +20,6 @@ public class UserController {
     public String queryUserById(@PathVariable("id") Integer id, Model model){
        User user= service.queryUserById(id);
        model.addAttribute("user",user);
-
        return "index";
     }
 
